@@ -5,25 +5,11 @@ function upload() {
     alert('Latitude: ' + lat + ', Longitude: ' + long);
  }
 
- // Initialize the map after the document loads
-document.addEventListener('DOMContentLoaded', function() {
-
-    // Replace with your desired center coordinates (latitude, longitude)
-    var map = L.map('map').setView([51.505, -0.09], 13); 
-
-    // Add a tile layer (e.g., OpenStreetMap)
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    }).addTo(map);
-
-});
-
-
   // Initialize the map after the document loads
 document.addEventListener('DOMContentLoaded', function() {
 
     // Replace with your desired center coordinates (latitude, longitude)
-    var map = L.map('map').setView([51.505, -0.09], 13); 
+    var map = L.map('map').setView([29.8660,  77.8905], 13); 
 
     // Add a tile layer (e.g., OpenStreetMap)
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -34,17 +20,48 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById("upload").addEventListener("click", updateMap);
 });
 
-// Function to update map center based on user input
-function updateMap() {
-  var latitude = parseFloat(document.getElementById("latitude").value);
-  var longitude = parseFloat(document.getElementById("longitude").value);
 
-  // Check if valid coordinates are entered
-  if (isNaN(latitude) || isNaN(longitude)) {
-    alert("Please enter valid latitude and longitude values.");
-    return;
-  }
+// Map initialization 
+var map = L.map('map').setView([29.8660,  77.8905], 20);
 
-  // Update map center
-  map.setView([latitude, longitude], 13); // Adjust zoom level as needed
+//osm layer
+var osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+});
+
+osm.addTo(map);
+
+  if(!navigator.geolocation) {
+    console.log("Your browser doesn't support geolocation feature!")
+    } 
+  else {
+      setInterval(() => {
+        navigator.geolocation.getCurrentPosition(getPosition)
+      }, 500);
+    }
+
+var marker, circle;
+
+function getPosition(position){
+        // console.log(position)
+      var lat = position.coords.latitude
+      var long = position.coords.longitude
+      var accuracy = position.coords.accuracy // Accuracy in terms of meters
+
+      if(marker) { // Red colored Marker to point your location
+          map.removeLayer(marker)
+      }
+
+      if(circle) { // Circle around your geo location
+        map.removeLayer(circle)
+      }
+
+      marker = L.marker([lat, long])
+      circle = L.circle([lat, long], {radius: accuracy})
+
+      var featureGroup = L.featureGroup([marker, circle]).addTo(map)
+
+      map.fitBounds(featureGroup.getBounds())
+
+      console.log("Your coordinate is: Lat: "+ lat +" Long: "+ long+ " Accuracy: "+ accuracy)
 }
