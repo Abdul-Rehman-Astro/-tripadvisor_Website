@@ -110,11 +110,34 @@ function getPosition(position){
 
       map.fitBounds(featureGroup.getBounds())
 
-      // Check if within target bounds (with some tolerance)
-      if (lat > southWest[0] && lat < northEast[0] && long > southWest[1] && long < northEast[1]) {
-        beep(10000); // Beep for 200 milliseconds
-        console.log("You've reached the target location!");
-      }
 
+
+
+    // Function to calculate distance between two lat/long pairs
+    function calculateDistance(lat1, long1, lat2, long2) {
+      // Radius of the Earth in meters
+      var R = 6371000;
+      var dLat = (lat2 - lat1) * Math.PI / 180;
+      var dLong = (long2 - long1) * Math.PI / 180;
+      var a = 
+          Math.sin(dLat/2) * Math.sin(dLat/2) +
+          Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+          Math.sin(dLong/2) * Math.sin(dLong/2);
+      var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+      var distance = R * c;
+      return distance;
+    }
+
+    // Check if current position (with accuracy) overlaps the bounding box
+    // Simplified check: if distance to any corner <= accuracy, consider it overlapping
+    var corners = [southWest, [southWest[0], northEast[1]], northEast, [northEast[0], southWest[1]]];
+    var overlaps = corners.some(corner => {
+        return calculateDistance(lat, long, corner[0], corner[1]) <= accuracy;
+    });
+
+  if (overlaps) {
+      beep(200); // Beep for 200 milliseconds
+      console.log("Near the target location within accuracy range!");
+  }
       console.log("Your coordinate is: Lat: "+ lat +" Long: "+ long+ " Accuracy: "+ accuracy)
 }
