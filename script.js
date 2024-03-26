@@ -105,7 +105,7 @@ function getPosition(position){
 
       // Check if within target bounds (with some tolerance)
       if (lat > southWest[0] && lat < northEast[0] && long > southWest[1] && long < northEast[1]) {
-        beep(200); // Beep for 200 milliseconds
+        beep(10000); // Beep for 200 milliseconds
         console.log("You've reached the target location!");
     }
 
