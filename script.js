@@ -1,3 +1,5 @@
+
+
 function upload() {
     var lat = document.getElementById('latitude').value;
     var long = document.getElementById('longitude').value;
@@ -5,11 +7,35 @@ function upload() {
     alert('Latitude: ' + lat + ', Longitude: ' + long);
  }
 
-  // Initialize the map after the document loads
+
+
+function beep(duration, frequency = 520, volume = 1, type = 'sine') {
+  var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  var oscillator = audioCtx.createOscillator();
+  var gainNode = audioCtx.createGain();
+
+  oscillator.connect(gainNode);
+  gainNode.connect(audioCtx.destination);
+
+  gainNode.gain.value = volume;
+  oscillator.frequency.value = frequency;
+  oscillator.type = type;
+
+  oscillator.start();
+
+  setTimeout(function() {
+      oscillator.stop();
+  }, duration);
+}
+
+
+
+// Initialize the map after the document loads
 document.addEventListener('DOMContentLoaded', function() {
 
     // Replace with your desired center coordinates (latitude, longitude)
     var map = L.map('map').setView([29.8660,  77.8905], 13); 
+
 
     // Add a tile layer (e.g., OpenStreetMap)
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -21,8 +47,29 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 
+
+
+
+
 // Map initialization 
 var map = L.map('map').setView([29.8660,  77.8905], 20);
+
+
+// Approximate location Vigyan Kunj
+var centerLat = 29.86220298700757;
+var centerLng = 77.90025148577993;
+
+// Creating a bounding box
+var southWest = [centerLat - 0.0001, centerLng - 0.0001];
+var northEast = [centerLat + 0.0001, centerLng + 0.0001];
+var bounds = [southWest, northEast];
+
+var rectangle = L.rectangle(bounds, {color: "#ff7800", weight: 1}).addTo(map);
+map.fitBounds(rectangle.getBounds());
+
+
+
+
 
 //osm layer
 var osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -37,7 +84,7 @@ osm.addTo(map);
   else {
       setInterval(() => {
         navigator.geolocation.getCurrentPosition(getPosition)
-      }, 500);
+      }, 500); // miliseconds update 
     }
 
 var marker, circle;
@@ -55,6 +102,13 @@ function getPosition(position){
       if(circle) { // Circle around your geo location
         map.removeLayer(circle)
       }
+
+      // Check if within target bounds (with some tolerance)
+      if (lat > southWest[0] && lat < northEast[0] && long > southWest[1] && long < northEast[1]) {
+        beep(200); // Beep for 200 milliseconds
+        console.log("You've reached the target location!");
+    }
+
 
       marker = L.marker([lat, long])
       circle = L.circle([lat, long], {radius: accuracy})
