@@ -103,19 +103,18 @@ function getPosition(position){
         map.removeLayer(circle)
       }
 
-      // Check if within target bounds (with some tolerance)
-      if (lat > southWest[0] && lat < northEast[0] && long > southWest[1] && long < northEast[1]) {
-        beep(10000); // Beep for 200 milliseconds
-        console.log("You've reached the target location!");
-    }
-
-
       marker = L.marker([lat, long])
       circle = L.circle([lat, long], {radius: accuracy})
 
       var featureGroup = L.featureGroup([marker, circle]).addTo(map)
 
       map.fitBounds(featureGroup.getBounds())
+
+      // Check if within target bounds (with some tolerance)
+      if (lat > southWest[0] && lat < northEast[0] && long > southWest[1] && long < northEast[1]) {
+        beep(10000); // Beep for 200 milliseconds
+        console.log("You've reached the target location!");
+      }
 
       console.log("Your coordinate is: Lat: "+ lat +" Long: "+ long+ " Accuracy: "+ accuracy)
 }
