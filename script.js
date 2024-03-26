@@ -110,6 +110,7 @@ function getPosition(position){
 
       map.fitBounds(featureGroup.getBounds())
 
+    
 
 
 
